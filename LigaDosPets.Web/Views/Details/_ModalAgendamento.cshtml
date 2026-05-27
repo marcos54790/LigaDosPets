@@ -1,0 +1,103 @@
+﻿@* Views/Details/_ModalAgendamento.cshtml *@
+@model LigaDosPets.Web.Models.DetailsModel
+
+<div class="modal fade" id="modalAgendamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <div class="modal-header" style="background: linear-gradient(135deg,#1D4ED8,#1e3a8a);">
+                <div>
+                    <h5 class="modal-title fw-bold text-white mb-0">
+                        🐾 Agendar Visita
+                    </h5>
+                    <p class="text-white-50 small mb-0">para conhecer @Model.Nome</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form asp-action="AgendarVisita" asp-controller="Details" method="post" id="formAgendamento">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="animalId" value="@Model.Id" />
+
+                <div class="modal-body p-4">
+
+                    @* Alerta de horário ocupado *@
+                    <div id="alertaHorario" class="alert alert-warning rounded-3 d-none" role="alert">
+                        <i class="bi bi-clock-fill me-2"></i>
+                        <span id="alertaHorarioTexto"></span>
+                    </div>
+
+                    @* Step 1: Data *@
+                    <div class="mb-4">
+                        <label class="modal-step-label">
+                            <span class="step-number">1</span> Escolha o dia
+                        </label>
+                        <input type="date"
+                               name="dataVisita"
+                               id="inputData"
+                               class="form-control form-control-lg rounded-3"
+                               required
+                               min="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                        <div id="avisoFDS" class="text-danger small mt-1" style="display:none;">
+                            <i class="bi bi-exclamation-circle me-1"></i>Atendimento apenas em dias úteis (Seg–Sex).
+                        </div>
+                    </div>
+
+                    @* Step 2: Horário *@
+                    <div class="mb-4">
+                        <label class="modal-step-label">
+                            <span class="step-number">2</span> Escolha o horário
+                            <span id="loadingHorarios" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                        </label>
+                        <div class="horarios-grid" id="horariosGrid">
+                            @{
+                                var ocupadosHoje = Model.HorariosOcupadosHoje ?? new List<string>();
+                            }
+                            @foreach (var hora in Model.HorariosDisponiveis)
+                            {
+                                var ocupado = ocupadosHoje.Contains(hora);
+                                <div class="horario-slot @(ocupado ? "ocupado" : "")" data-hora="@hora">
+                                    <input type="radio"
+                                           class="btn-check"
+                                           name="horaVisita"
+                                           id="h-@hora"
+                                           value="@hora"
+                                           required
+                                           @(ocupado ? "disabled" : "") />
+                                    <label class="horario-label" for="h-@hora">
+                                        @hora
+                                        @if (ocupado)
+                                        {
+                                            <span class="horario-ocupado-badge">Ocupado</span>
+                                        }
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <p class="text-muted small mt-2 mb-0">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Apenas um agendamento por horário para controle do fluxo de visitas.
+                        </p>
+                    </div>
+
+                    @* Step 3: Observações *@
+                    <div class="mb-2">
+                        <label class="modal-step-label">
+                            <span class="step-number">3</span> Observações <span class="text-muted fw-normal">(opcional)</span>
+                        </label>
+                        <textarea name="observacao"
+                                  class="form-control rounded-3"
+                                  rows="2"
+                                  placeholder="Alguma dúvida ou informação importante?"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                    <button type="submit" class="btn-custom btn-orange w-100 py-3 fw-bold" id="btnConfirmar">
+                        <i class="bi bi-calendar-check me-2"></i> Confirmar Agendamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

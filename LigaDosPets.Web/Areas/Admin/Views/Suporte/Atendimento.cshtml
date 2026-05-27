@@ -1,0 +1,90 @@
+@model IEnumerable<LigaDosPets.Application.DTOs.Conversa.MensagemDto>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Atendimento";
+    var conversaId = (int)ViewBag.ConversaId;
+    var adminId = (int)ViewBag.AdminId;
+    var outroUsuarioNome = ViewBag.OutroUsuarioNome as string ?? "Usuário";
+}
+
+<div class="chat-page-wrap">
+    <div class="chat-page-header">
+        <div class="d-flex align-items-center gap-3">
+            <a asp-action="Index" class="crud-back-btn">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div class="chat-avatar user">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <div>
+                <div class="chat-page-nome">@outroUsuarioNome</div>
+                <div class="chat-page-status">
+                    <span class="chat-online-dot"></span> Conversa ativa
+                </div>
+            </div>
+        </div>
+        <div class="chat-page-actions d-flex gap-2">
+            <span class="chat-conv-id text-muted small">
+                <i class="bi bi-hash me-1"></i>Conversa @conversaId
+            </span>
+            <form asp-action="Finalizar" asp-route-id="@conversaId" method="post" class="d-inline"
+                  onsubmit="return confirm('Tem certeza que deseja finalizar este atendimento?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Finalizar Atendimento">
+                    <i class="bi bi-x-circle me-1"></i> Finalizar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="chat-messages-area" id="chatMessages">
+        @foreach (var msg in Model)
+        {
+            var isMeu = msg.RemetenteId == adminId;
+            <div class="chat-msg @(isMeu ? "meu" : "deles")">
+                @if (!isMeu)
+                {
+                    <div class="chat-msg-avatar user">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                }
+                <div class="chat-msg-bubble">
+                    @if (!isMeu)
+                    {
+                        <div class="chat-msg-nome">@msg.NomeRemetente</div>
+                    }
+                    <div class="chat-msg-text">@msg.Conteudo</div>
+                    <div class="chat-msg-time">@msg.DataEnvio.ToString("HH:mm")</div>
+                </div>
+            </div>
+        }
+        <div id="digitandoIndicador" class="chat-digitando d-none">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <div class="chat-input-wrap">
+            <textarea id="inputMensagem"
+                      class="chat-textarea"
+                      placeholder="Responder..."
+                      rows="1"
+                      maxlength="500"></textarea>
+            <button id="btnEnviar" class="chat-send-btn">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script src="~/js/chat.js"></script>
+    <script>
+        ChatLiga.init({
+        conversaId: @conversaId,
+        usuarioId:  @adminId,
+        isAdmin:    true
+        });
+    </script>
+}

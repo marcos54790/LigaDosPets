@@ -1,0 +1,190 @@
+﻿@model LigaDosPets.Web.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Liga dos Pets — Adote um Herói";
+}
+
+@* ── HERO ──────────────────────────────────────────────────── *@
+<section class="home-hero">
+    <div class="home-hero-bg"></div>
+    <div class="container home-hero-content">
+        <div class="home-hero-badge">🐾 Plataforma de Adoção Responsável</div>
+        <h1 class="home-hero-title">
+            Cada Pet Merece<br>Um <span class="home-hero-highlight">Lar com Amor</span>
+        </h1>
+        <p class="home-hero-subtitle">
+            Conectamos animais que precisam de um lar a famílias dispostas a amar.<br>
+            Adote, transforme uma vida — e a sua também.
+        </p>
+        <div class="home-hero-actions">
+            <a asp-controller="Animais" asp-action="Index" class="btn-custom btn-orange shadow-lg">
+                <i class="bi bi-search-heart me-2"></i> Encontrar Meu Pet
+            </a>
+            <a href="#como-funciona" class="home-hero-link">
+                Como funciona <i class="bi bi-arrow-down-circle ms-1"></i>
+            </a>
+        </div>
+    </div>
+    <div class="home-hero-wave">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#F8FAFC"/>
+        </svg>
+    </div>
+</section>
+
+@* ── ESTATÍSTICAS ──────────────────────────────────────────── *@
+<section class="home-stats">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-6 col-md-4">
+                <div class="home-stat-card">
+                    <div class="home-stat-icon">🐶</div>
+                    <div class="home-stat-value">@Model.TotalAnimaisDisponiveis</div>
+                    <div class="home-stat-label">Pets disponíveis</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="home-stat-card">
+                    <div class="home-stat-icon">🏠</div>
+                    <div class="home-stat-value">@Model.TotalAdotados</div>
+                    <div class="home-stat-label">Lares encontrados</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="home-stat-card">
+                    <div class="home-stat-icon">🌟</div>
+                    <div class="home-stat-value">@Model.TotalEspecies</div>
+                    <div class="home-stat-label">Espécies acolhidas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ── DESTAQUES ─────────────────────────────────────────────── *@
+@if (Model.AnimaisDestaque.Any())
+{
+    <section class="py-5 my-3">
+        <div class="container">
+            <div class="home-section-header">
+                <div>
+                    <h2 class="home-section-title">Heróis em Destaque</h2>
+                    <p class="home-section-sub">Recém chegados esperando por você</p>
+                </div>
+                <a asp-controller="Animais" asp-action="Index" class="home-see-all">
+                    Ver todos <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="row g-4">
+                @foreach (var animal in Model.AnimaisDestaque)
+                {
+                    <div class="col-sm-6 col-lg-3">
+                        <div class="pet-card border-0 shadow-sm">
+                            <div class="pet-card-img-wrapper">
+                                <img src="@(animal.FotoPrincipalUrl ?? "/images/pets/placeholder.jpg")"
+                                     alt="@animal.Nome" loading="lazy">
+                                <span class="badge-species">@animal.Especie</span>
+                            </div>
+                            <div class="card-body d-flex flex-column p-3">
+                                <h5 class="fw-bold mb-1">@animal.Nome</h5>
+                                <p class="text-muted small mb-3">
+                                    @if (animal.Sexo == "Macho")
+                                    { <i class="bi bi-gender-male text-primary"></i> }
+                                    else
+                                    { <i class="bi bi-gender-female text-danger"></i> }
+                                    @animal.Sexo
+                                    <span class="mx-1">·</span>
+                                    @(animal.Raca ?? "SRD")
+                                    @if (animal.Idade.HasValue)
+                                    {
+                                        <span class="mx-1">·</span>
+                                        @($"{animal.Idade} ano{(animal.Idade > 1 ? "s" : "")}")
+                                    }
+                                </p>
+                                <a asp-controller="Details" asp-action="Details" asp-route-id="@animal.Id"
+                                   class="btn-custom btn-blue-outline w-100 mt-auto py-2 text-center">
+                                    Conhecer História
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@* ── COMO FUNCIONA ─────────────────────────────────────────── *@
+<section class="home-how" id="como-funciona">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="home-section-title">Como Funciona</h2>
+            <p class="home-section-sub">Simples, rápido e cheio de amor</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="home-step-card">
+                    <div class="home-step-number">01</div>
+                    <div class="home-step-icon">🔍</div>
+                    <h5 class="fw-bold mt-3 mb-2">Explore o Catálogo</h5>
+                    <p class="text-muted small mb-0">Filtre por espécie, porte, sexo e encontre o pet ideal para o seu estilo de vida.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="home-step-card">
+                    <div class="home-step-number">02</div>
+                    <div class="home-step-icon">📅</div>
+                    <h5 class="fw-bold mt-3 mb-2">Agende uma Visita</h5>
+                    <p class="text-muted small mb-0">Escolha um horário e venha conhecer pessoalmente o seu futuro companheiro.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="home-step-card">
+                    <div class="home-step-number">03</div>
+                    <div class="home-step-icon">🏠</div>
+                    <h5 class="fw-bold mt-3 mb-2">Leve para Casa</h5>
+                    <p class="text-muted small mb-0">Assine o termo de adoção responsável e comece uma nova história juntos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ── SOBRE ─────────────────────────────────────────────────── *@
+<section class="py-5 my-3">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <img src="/imagens/home_ft.jpg"
+                     class="img-fluid rounded-4 shadow-lg img-hover-effect"
+                     alt="Gato e cachorro amigos" />
+            </div>
+            <div class="col-lg-6">
+                <span class="home-tag">Nossa missão</span>
+                <h2 class="home-section-title mt-2">Tecnologia a serviço da vida animal</h2>
+                <p class="text-muted mb-3">
+                    A Liga dos Pets nasceu da paixão por tecnologia e pela causa animal.
+                    Nossa plataforma conecta de forma ágil e transparente animais que precisam
+                    de um lar a famílias prontas para amar.
+                </p>
+                <p class="text-muted mb-4">
+                    Acreditamos que cada adoção responsável transforma duas vidas: a do pet
+                    e a da família que o acolhe.
+                </p>
+                <a asp-controller="Animais" asp-action="Index" class="btn-custom btn-orange">
+                    <i class="bi bi-heart-fill me-2"></i> Adotar Agora
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* ── CTA FINAL ─────────────────────────────────────────────── *@
+<section class="home-cta">
+    <div class="container text-center">
+        <h2 class="home-cta-title">Tem um pet que precisa de um lar?</h2>
+        <p class="home-cta-sub">Cadastre seu animal e ajude a encontrar uma família para ele.</p>
+        <a asp-controller="Animais" asp-action="Create" class="btn-custom btn-orange shadow">
+            <i class="bi bi-plus-circle me-2"></i> Cadastrar Pet para Adoção
+        </a>
+    </div>
+</section>

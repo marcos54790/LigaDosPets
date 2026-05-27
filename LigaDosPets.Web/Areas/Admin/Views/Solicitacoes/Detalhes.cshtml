@@ -1,0 +1,119 @@
+﻿@model LigaDosPets.Application.DTOs.SolicitacaoEntrega.SolicitacaoDto
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Detalhes da Solicitação";
+}
+
+<div class="crud-page-header">
+    <div>
+        <h4 class="crud-page-title">Solicitação de @Model.NomeAnimal</h4>
+    </div>
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill">Voltar</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="crud-form-card">
+            <h5>Dados do Animal</h5>
+
+            @* Fotos da solicitação *@
+            @if (Model.Fotos != null && Model.Fotos.Any())
+            {
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    @foreach (var foto in Model.Fotos)
+                    {
+                        <img src="@foto" alt="Foto do animal" style="width:120px; height:120px; object-fit:cover; border-radius:8px;" />
+                    }
+                </div>
+            }
+            else
+            {
+                <p><em>Nenhuma foto enviada.</em></p>
+            }
+
+            <p><strong>Nome:</strong> @Model.NomeAnimal</p>
+            @if (!string.IsNullOrEmpty(Model.DescricaoAnimal))
+            {
+                <p><strong>Descrição:</strong> @Model.DescricaoAnimal</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.MotivoEntrega))
+            {
+                <p><strong>Motivo da Entrega:</strong> @Model.MotivoEntrega</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.EspecieDescricao))
+            {
+                <p><strong>Espécie:</strong> @Model.EspecieDescricao</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.RacaDescricao))
+            {
+                <p><strong>Raça:</strong> @Model.RacaDescricao</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.IdadeEstimada))
+            {
+                <p><strong>Idade Estimada:</strong> @Model.IdadeEstimada</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.PorteDescricao))
+            {
+                <p><strong>Porte:</strong> @Model.PorteDescricao</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.CaracteristicasDescricao))
+            {
+                <p><strong>Características:</strong> @Model.CaracteristicasDescricao</p>
+            }
+
+            <!-- Dados do solicitante -->
+            <h5>Dados do Solicitante</h5>
+            <p><strong>Nome:</strong> @Model.NomeUsuario</p>
+            @if (!string.IsNullOrEmpty(Model.EmailUsuario))
+            {
+                <p><strong>E-mail:</strong> @Model.EmailUsuario</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.TelefoneUsuario))
+            {
+                <p><strong>Telefone:</strong> @Model.TelefoneUsuario</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.CepUsuario))
+            {
+                <p><strong>CEP:</strong> @Model.CepUsuario</p>
+            }
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="crud-form-card">
+            <h5>Ações</h5>
+            <form asp-action="Aprovar" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-success w-100 mb-2">
+                    <i class="bi bi-check-circle me-1"></i> Aprovar
+                </button>
+            </form>
+            <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#modalRejeitar">
+                <i class="bi bi-x-circle me-1"></i> Rejeitar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Rejeitar -->
+<div class="modal fade" id="modalRejeitar" tabindex="-1">
+    <div class="modal-dialog">
+        <form asp-action="Rejeitar" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>Rejeitar Solicitação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea name="motivo" class="form-control" rows="3" placeholder="Motivo da rejeição..." required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Rejeitar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

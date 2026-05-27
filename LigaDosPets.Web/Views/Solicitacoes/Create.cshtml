@@ -1,0 +1,185 @@
+@model LigaDosPets.Application.DTOs.Animal.CreateAnimalDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cadastrar Pet";
+}
+
+<section class="user-dash-hero">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            @* CORREÇÃO: link para o Dashboard do usuário *@
+            <a asp-controller="Dashboard" asp-action="Dashboard" class="create-back-btn">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="user-dash-title">Cadastrar Pet para Adoção</h1>
+                <p class="user-dash-sub">Preencha os dados do animal. Nossa equipe irá revisar antes de publicar.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            @* Banner de fluxo *@
+            <div class="create-flow-banner mb-4">
+                <div class="create-flow-step done">
+                    <span class="flow-num">✓</span>
+                    <span>Perfil habilitado</span>
+                </div>
+                <div class="create-flow-arrow"><i class="bi bi-chevron-right"></i></div>
+                <div class="create-flow-step active">
+                    <span class="flow-num">2</span>
+                    <span>Dados do pet</span>
+                </div>
+                <div class="create-flow-arrow"><i class="bi bi-chevron-right"></i></div>
+                <div class="create-flow-step">
+                    <span class="flow-num">3</span>
+                    <span>Revisão da ONG</span>
+                </div>
+                <div class="create-flow-arrow"><i class="bi bi-chevron-right"></i></div>
+                <div class="create-flow-step">
+                    <span class="flow-num">4</span>
+                    <span>Publicado</span>
+                </div>
+            </div>
+
+            <div class="perfil-card">
+                <form asp-action="Create" method="post" enctype="multipart/form-data" id="formCriarPet">
+                    @Html.AntiForgeryToken()
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="auth-alert mb-4">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div asp-validation-summary="ModelOnly"></div>
+                        </div>
+                    }
+
+                    @* ── Informações básicas ──────────────────────── *@
+                    <div class="perfil-section-label">Informações básicas</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="perfil-label">Nome do pet</label>
+                            <input asp-for="Nome" class="form-control perfil-input"
+                                   placeholder="Ex: Bob, Lilica, Chico..." />
+                            <span asp-validation-for="Nome" class="field-error"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="perfil-label">Idade (anos)</label>
+                            <input asp-for="Idade" type="number" min="0" max="30"
+                                   class="form-control perfil-input" placeholder="Ex: 3" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="perfil-label">Sexo</label>
+                            <select asp-for="Sexo" class="form-select perfil-input">
+                                <option value="">Selecione...</option>
+                                <option value="Macho">Macho</option>
+                                <option value="Fêmea">Fêmea</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @* ── Categorização ────────────────────────────── *@
+                    <div class="perfil-section-label">Categorização</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="perfil-label">Espécie</label>
+                            <select asp-for="EspecieId" id="selectEspecie" class="form-select perfil-input"
+                                    asp-items="@(new SelectList(ViewBag.Especies, "Id", "Nome"))">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="perfil-label">Raça</label>
+                            <select asp-for="RacaId" id="selectRaca" class="form-select perfil-input" disabled>
+                                <option value="">Aguardando espécie...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="perfil-label">Porte</label>
+                            <select asp-for="PorteId" class="form-select perfil-input">
+                                <option value="">Selecione...</option>
+                                @foreach (var porte in ((IEnumerable<dynamic>)ViewBag.Portes).GroupBy((dynamic p) => p.Nome).Select(g => g.First()))
+                                {
+                                    <option value="@porte.Id">@porte.Nome</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    @* ── Características ──────────────────────────── *@
+                    <div class="perfil-section-label">Características</div>
+                    <div class="create-tags mb-4">
+                        @if (ViewBag.Caracteristicas != null)
+                        {
+                            foreach (var item in ((IEnumerable<dynamic>)ViewBag.Caracteristicas).GroupBy((dynamic c) => c.Nome).Select(g => g.First()))
+                            {
+                                <div class="create-tag-item">
+                                    <input type="checkbox" name="CaracteristicasIds"
+                                           value="@item.Id" id="tag_@item.Id" class="btn-check" />
+                                    <label class="create-tag-label" for="tag_@item.Id">
+                                        <i class="bi bi-check2 me-1"></i>@item.Nome
+                                    </label>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    @* ── Fotos ────────────────────────────────────── *@
+                    <div class="perfil-section-label">Fotos do animal</div>
+                    <div class="create-upload-area mb-4" onclick="document.getElementById('inputFotos').click()">
+                        <i class="bi bi-camera-fill create-upload-icon"></i>
+                        <p class="mb-1 fw-600">Clique para adicionar fotos</p>
+                        <p class="text-muted small mb-0">JPG, PNG — máximo 5 fotos</p>
+                        <input type="file" asp-for="Fotos" id="inputFotos"
+                               multiple accept="image/*" class="d-none"
+                               onchange="previewImages(this)" />
+                    </div>
+                    <div id="previewContainer" class="create-preview-grid mb-4"></div>
+
+                    @* ── Descrição e motivo ───────────────────────── *@
+                    <div class="perfil-section-label">Sobre o pet</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="perfil-label">Descrição</label>
+                            <textarea asp-for="Descricao" class="form-control perfil-input" rows="5"
+                                      placeholder="Conte sobre a personalidade, o que ele gosta, como se relaciona..."></textarea>
+                            <span asp-validation-for="Descricao" class="field-error"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="perfil-label">Motivo da doação</label>
+                            <textarea asp-for="MotivoDoacao" class="form-control perfil-input" rows="5"
+                                      placeholder="Explique por que o pet precisa de um novo lar..."></textarea>
+                            <span asp-validation-for="MotivoDoacao" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    @* ── Aviso de revisão ─────────────────────────── *@
+                    <div class="create-review-notice mb-4">
+                        <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+                        Após o envio, sua solicitação será <strong>revisada pela equipe da Liga dos Pets</strong> antes de aparecer no catálogo público. Você será notificado sobre o resultado.
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                        @* CORREÇÃO: link para o Dashboard do usuário *@
+                        <a asp-controller="Dashboard" asp-action="Dashboard" class="text-muted text-decoration-none fw-500">
+                            <i class="bi bi-arrow-left me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn-custom btn-orange px-5 py-3">
+                            <i class="bi bi-send-fill me-2"></i> Enviar para Análise
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/raca-dinamica.js" asp-append-version="true"></script>
+    <script src="~/js/preview-foto.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,162 @@
+﻿@model IEnumerable<LigaDosPets.Application.DTOs.Animal.AnimalListDto>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Pets";
+}
+
+@* ── Cabeçalho ─────────────────────────────────────────────── *@
+<div class="crud-page-header">
+    <div>
+        <h4 class="crud-page-title">🐾 Todos os Pets</h4>
+        <p class="crud-page-sub">Todos os animais cadastrados no sistema.</p>
+    </div>
+    <a asp-action="Create" class="btn-custom btn-orange crud-add-btn">
+        <i class="bi bi-plus-lg me-1"></i> Novo Pet
+    </a>
+</div>
+
+@* ── Tabela ────────────────────────────────────────────────── *@
+@if (Model != null && Model.Any())
+{
+    <div class="crud-table-wrap">
+        <table class="crud-table">
+            <thead>
+                <tr>
+                    <th style="width:60px"></th>
+                    <th>Pet</th>
+                    <th>Espécie / Raça</th>
+                    <th>Porte</th>
+                    <th>Sexo</th>
+                    <th>Idade</th>
+                    <th>Status</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var animal in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="crud-animal-thumb">
+                                <img src="@(animal.FotoPrincipalUrl ?? "/images/pets/placeholder.jpg")"
+                                     alt="@animal.Nome"
+                                     onerror="this.src='/images/pets/placeholder.jpg'" />
+                            </div>
+                        </td>
+                        <td>
+                            <span class="crud-animal-name">@animal.Nome</span>
+                        </td>
+                        <td>
+                            <span class="crud-badge crud-badge-blue">@animal.Especie</span>
+                            <span class="crud-badge crud-badge-gray ms-1">@(animal.Raca ?? "SRD")</span>
+                        </td>
+                        <td class="text-muted small">@animal.Porte</td>
+                        <td>
+                            @if (animal.Sexo == "Macho")
+                            {
+                                <span class="crud-sexo male"><i class="bi bi-gender-male"></i> Macho</span>
+                            }
+                            else
+                            {
+                                <span class="crud-sexo female"><i class="bi bi-gender-female"></i> Fêmea</span>
+                            }
+                        </td>
+                        <td class="text-muted small">
+                            @(animal.Idade.HasValue ? $"{animal.Idade} ano{(animal.Idade > 1 ? "s" : "")}" : "—")
+                        </td>
+                        <td>
+                            @if (animal.AguardandoValidacao)
+                            {
+                                <span class="crud-badge crud-badge-orange">
+                                    <i class="bi bi-hourglass-split me-1"></i>Pendente
+                                </span>
+                            }
+                            else if (animal.DisponivelParaAdocao)
+                            {
+                                <span class="crud-badge crud-badge-green">
+                                    <i class="bi bi-check-circle me-1"></i>Disponível
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="crud-badge crud-badge-blue">
+                                    <i class="bi bi-house-heart me-1"></i>Adotado
+                                </span>
+                            }
+                        </td>
+                        <td>
+                            <div class="crud-actions">
+                                <a asp-area="" asp-controller="Details" asp-action="Details"
+                                   asp-route-id="@animal.Id"
+                                   class="crud-action-btn view" title="Ver no catálogo">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@animal.Id"
+                                   class="crud-action-btn edit" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button type="button" class="crud-action-btn delete" title="Excluir"
+                                        data-bs-toggle="modal" data-bs-target="#modalExcluir"
+                                        data-id="@animal.Id" data-nome="@animal.Nome">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="crud-empty">
+        <div class="crud-empty-icon">🐾</div>
+        <h4>Nenhum pet cadastrado</h4>
+        <p class="text-muted">Cadastre o primeiro animal pelo botão acima.</p>
+    </div>
+}
+
+@* ── Modal: Excluir ────────────────────────────────────────── *@
+<div class="modal fade" id="modalExcluir" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Excluir animal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">
+                    Tem certeza que deseja excluir permanentemente
+                    <strong id="nomeAnimalExcluir"></strong>?
+                    Esta ação não pode ser desfeita.
+                </p>
+            </div>
+            <div class="modal-footer border-0 pt-0 gap-2">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <form id="formExcluir" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        <i class="bi bi-trash3 me-1"></i> Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var modalExcluir = document.getElementById('modalExcluir');
+        if (modalExcluir) {
+            modalExcluir.addEventListener('show.bs.modal', function (e) {
+                var btn = e.relatedTarget;
+                document.getElementById('nomeAnimalExcluir').textContent = btn.dataset.nome;
+                document.getElementById('formExcluir').action = '/Admin/Animais/Delete/' + btn.dataset.id;
+            });
+        }
+    </script>
+    <script src="~/js/admin-animais.js" asp-append-version="true"></script>
+}

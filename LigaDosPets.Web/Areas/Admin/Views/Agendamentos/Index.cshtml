@@ -1,0 +1,336 @@
+@model IEnumerable<LigaDosPets.Application.DTOs.Agendamento.AgendamentoDto>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Agendamentos";
+    var aba = ViewBag.Aba as string ?? "pendentes";
+}
+
+@* ── Cabeçalho ─────────────────────────────────────────────── *@
+<div class="crud-page-header">
+    <div>
+        <h4 class="crud-page-title">📅 Agendamentos de Visita</h4>
+        <p class="crud-page-sub">Gerencie as visitas agendadas pelos interessados em adoção.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-action="Index" class="crud-tab-btn @(aba == "pendentes" ? "active" : "")">
+            <i class="bi bi-hourglass-split me-1"></i> Pendentes
+        </a>
+        <a asp-action="Futuros" class="crud-tab-btn @(aba == "futuros" ? "active" : "")">
+            <i class="bi bi-calendar-check me-1"></i> Confirmados
+        </a>
+    </div>
+</div>
+
+@* ── Tabela ────────────────────────────────────────────────── *@
+@if (Model != null && Model.Any())
+{
+    <div class="crud-table-wrap">
+        <table class="crud-table">
+            <thead>
+                <tr>
+                    <th>Animal</th>
+                    <th>Visitante</th>
+                    <th>Data e Hora</th>
+                    <th>Status</th>
+                    <th>Observações</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ag in Model.OrderBy(a => a.DataVisita))
+                {
+                    var hoje = DateTime.Today;
+                    var diasRestantes = (ag.DataVisita.Date - hoje).TotalDays;
+                    var rowClass = diasRestantes <= 0 ? "table-warning" :
+                                   diasRestantes <= 2 ? "table-light" : "";
+
+                    var statusClass = ag.Status switch
+                    {
+                        "Confirmado" => "crud-badge-green",
+                        "Realizado" => "crud-badge-blue",
+                        "Cancelado" => "crud-badge-gray",
+                        _ => "crud-badge-orange"
+                    };
+                    var statusIcon = ag.Status switch
+                    {
+                        "Confirmado" => "bi-check-circle-fill",
+                        "Realizado" => "bi-house-heart-fill",
+                        "Cancelado" => "bi-x-circle-fill",
+                        _ => "bi-hourglass-split"
+                    };
+
+                    <tr class="@rowClass">
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="crud-simple-icon">
+                                    <i class="bi bi-heart-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="crud-animal-name">@ag.NomeAnimal</div>
+                                    <a asp-area="" asp-controller="Details" asp-action="Details"
+                                       asp-route-id="@ag.AnimalId"
+                                       class="text-muted small text-decoration-none">
+                                        Ver no catálogo <i class="bi bi-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="crud-simple-icon purple">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span class="fw-600">@ag.NomeUsuario</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ag-data-hora">
+                                <span class="ag-data">
+                                    <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                    @ag.DataVisita.ToString("dd/MM/yyyy")
+                                </span>
+                                <span class="ag-hora">
+                                    <i class="bi bi-clock me-1 text-muted"></i>
+                                    @ag.DataVisita.ToString("HH:mm")
+                                </span>
+                                @if (diasRestantes == 0)
+                                {
+                                    <span class="ag-urgencia hoje">Hoje</span>
+                                }
+                                else if (diasRestantes == 1)
+                                {
+                                    <span class="ag-urgencia amanha">Amanhã</span>
+                                }
+                                else if (diasRestantes < 0)
+                                {
+                                    <span class="ag-urgencia passado">Passado</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <span class="crud-badge @statusClass">
+                                <i class="bi @statusIcon me-1"></i>@ag.Status
+                            </span>
+                        </td>
+                        <td>
+                            <span class="text-muted small">
+                                @(string.IsNullOrEmpty(ag.Observacao) ? "—" :
+                                  ag.Observacao.Length > 40
+                                    ? ag.Observacao[..40] + "..."
+                                    : ag.Observacao)
+                            </span>
+                        </td>
+                        <td>
+                            <div class="crud-actions">
+                                @* Realizar — abre modal com pergunta de adoção *@
+                                @if (ag.Status == "Pendente" || ag.Status == "Confirmado")
+                                {
+                                    <button type="button"
+                                            class="crud-action-btn view"
+                                            title="Realizar visita"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalRealizar"
+                                            data-id="@ag.Id"
+                                            data-animal="@ag.NomeAnimal"
+                                            data-visitante="@ag.NomeUsuario">
+                                        <i class="bi bi-house-heart"></i>
+                                    </button>
+                                }
+
+                                @* Cancelar — abre modal *@
+                                @if (ag.Status != "Cancelado" && ag.Status != "Realizado")
+                                {
+                                    <button type="button"
+                                            class="crud-action-btn reject"
+                                            title="Cancelar agendamento"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalCancelar"
+                                            data-id="@ag.Id"
+                                            data-nome="@ag.NomeUsuario"
+                                            data-animal="@ag.NomeAnimal"
+                                            data-hora="@ag.DataVisita.ToString("dd/MM HH:mm")">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="crud-empty">
+        <div class="crud-empty-icon">📅</div>
+        <h4>@(aba == "pendentes" ? "Nenhum agendamento pendente" : "Nenhum agendamento encontrado")</h4>
+        <p class="text-muted">
+            @(aba == "pendentes"
+                ? "Quando usuários agendarem visitas, elas aparecerão aqui."
+                : "Não há agendamentos no período selecionado.")
+        </p>
+    </div>
+}
+
+@* ── Modal: Realizar (com pergunta de adoção) ──────────────── *@
+<div class="modal fade" id="modalRealizar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+
+            <div class="modal-header border-0 pb-0"
+                 style="background: linear-gradient(135deg,#f0fdf4,#dcfce7);">
+                <div>
+                    <h5 class="modal-title fw-bold text-success mb-0">
+                        <i class="bi bi-house-heart-fill me-2"></i>Visita Realizada
+                    </h5>
+                    <p class="text-muted small mb-0" id="subtituloRealizar"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="formRealizar" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="foiAdotado" id="inputFoiAdotado" value="false" />
+
+                <div class="modal-body px-4 pt-4 pb-2">
+                    <p class="fw-600 text-dark mb-3" style="font-size:0.95rem;">
+                        <i class="bi bi-question-circle-fill text-primary me-2"></i>
+                        O animal foi adotado durante esta visita?
+                    </p>
+
+                    <div class="d-flex gap-3 mb-2">
+                        <div class="flex-fill">
+                            <input type="radio" class="btn-check" name="adocaoChoice"
+                                   id="simAdotado" value="true" />
+                            <label class="btn btn-outline-success w-100 rounded-3 py-3 d-flex flex-column align-items-center gap-1"
+                                   for="simAdotado">
+                                <i class="bi bi-house-heart-fill fs-3"></i>
+                                <span class="fw-bold" style="font-size:0.9rem;">Sim, foi adotado!</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Remove do catálogo</span>
+                            </label>
+                        </div>
+                        <div class="flex-fill">
+                            <input type="radio" class="btn-check" name="adocaoChoice"
+                                   id="naoAdotado" value="false" />
+                            <label class="btn btn-outline-secondary w-100 rounded-3 py-3 d-flex flex-column align-items-center gap-1"
+                                   for="naoAdotado">
+                                <i class="bi bi-calendar2-plus fs-3"></i>
+                                <span class="fw-bold" style="font-size:0.9rem;">Não desta vez</span>
+                                <span class="text-muted" style="font-size:0.75rem;">Permanece disponível</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="avisoAdocao" class="alert alert-success rounded-3 py-2 d-none mt-3"
+                         style="font-size:0.83rem;">
+                        <i class="bi bi-megaphone-fill me-2"></i>
+                        O animal será marcado como <strong>adotado</strong> e removido do catálogo. 🎉
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 px-4 pb-4 pt-2 gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold"
+                            id="btnConfirmarRealizar" disabled>
+                        <i class="bi bi-check-circle me-1"></i> Confirmar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@* ── Modal: Cancelar ───────────────────────────────────────── *@
+<div class="modal fade" id="modalCancelar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Cancelar agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCancelar" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <p class="text-muted mb-1">
+                        Visita de <strong id="nomeVisitante"></strong>
+                        para ver <strong id="nomeAnimalModal"></strong>
+                        em <strong id="horaAgendamento"></strong>.
+                    </p>
+                    <p class="text-muted mb-3 small">Informe o motivo do cancelamento:</p>
+                    <textarea name="motivo"
+                              class="form-control rounded-3"
+                              rows="3"
+                              placeholder="Ex: Solicitado pelo visitante, animal adotado, reagendamento..."
+                              required></textarea>
+                </div>
+                <div class="modal-footer border-0 pt-0 gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">
+                        Voltar
+                    </button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        <i class="bi bi-x-circle me-1"></i> Confirmar Cancelamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ── Modal: Realizar ───────────────────────────────────
+        var modalRealizar = document.getElementById('modalRealizar');
+        if (modalRealizar) {
+            modalRealizar.addEventListener('show.bs.modal', function (e) {
+                var btn = e.relatedTarget;
+                var animal    = btn.dataset.animal;
+                var visitante = btn.dataset.visitante;
+                var id        = btn.dataset.id;
+
+                document.getElementById('subtituloRealizar').textContent =
+                    visitante + ' visitou ' + animal;
+                document.getElementById('formRealizar').action =
+                    '/Admin/Agendamentos/Realizar/' + id;
+
+                // Reset
+                document.querySelectorAll('input[name="adocaoChoice"]')
+                    .forEach(r => r.checked = false);
+                document.getElementById('inputFoiAdotado').value = 'false';
+                document.getElementById('btnConfirmarRealizar').disabled = true;
+                document.getElementById('avisoAdocao').classList.add('d-none');
+            });
+
+            // Ao escolher opção
+            document.querySelectorAll('input[name="adocaoChoice"]').forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    var foiAdotado = this.value === 'true';
+                    document.getElementById('inputFoiAdotado').value = this.value;
+                    document.getElementById('btnConfirmarRealizar').disabled = false;
+
+                    var aviso = document.getElementById('avisoAdocao');
+                    foiAdotado
+                        ? aviso.classList.remove('d-none')
+                        : aviso.classList.add('d-none');
+                });
+            });
+        }
+
+        // ── Modal: Cancelar ───────────────────────────────────
+        var modalCancelar = document.getElementById('modalCancelar');
+        if (modalCancelar) {
+            modalCancelar.addEventListener('show.bs.modal', function (e) {
+                var btn = e.relatedTarget;
+                document.getElementById('nomeVisitante').textContent   = btn.dataset.nome;
+                document.getElementById('nomeAnimalModal').textContent  = btn.dataset.animal;
+                document.getElementById('horaAgendamento').textContent  = btn.dataset.hora;
+                document.getElementById('formCancelar').action =
+                    '/Admin/Agendamentos/Cancelar/' + btn.dataset.id;
+            });
+        }
+    </script>
+}

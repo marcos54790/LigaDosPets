@@ -1,0 +1,207 @@
+@model IEnumerable<LigaDosPets.Application.DTOs.SolicitacaoEntrega.SolicitacaoDto>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Minhas Solicitações";
+}
+
+<section class="user-dash-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="user-dash-title">Minhas Solicitações 📋</h1>
+                <p class="user-dash-sub">Acompanhe o status dos pets que você enviou para análise</p>
+            </div>
+            <a asp-action="Create" class="btn-custom btn-orange shadow">
+                <i class="bi bi-plus-circle me-2"></i> Nova Solicitação
+            </a>
+        </div>
+    </div>
+</section>
+
+<div class="container user-dash-body">
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var sol in Model.OrderByDescending(s => s.DataSolicitacao))
+            {
+                string statusClass = sol.Status switch
+                {
+                    "Aprovado"  => "sol-status-aprovado",
+                    "Rejeitado" => "sol-status-rejeitado",
+                    _           => "sol-status-pendente"
+                };
+                string statusIcon = sol.Status switch
+                {
+                    "Aprovado"  => "bi-check-circle-fill",
+                    "Rejeitado" => "bi-x-circle-fill",
+                    _           => "bi-hourglass-split"
+                };
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="sol-card">
+                        <div class="sol-card-header">
+                            <div class="sol-animal-nome">@sol.NomeAnimal</div>
+                            <span class="sol-status @statusClass">
+                                <i class="bi @statusIcon me-1"></i>@sol.Status
+                            </span>
+                        </div>
+
+                        <div class="sol-card-body">
+                            @if (!string.IsNullOrEmpty(sol.EspecieDescricao))
+                            {
+                                <div class="sol-info-row">
+                                    <i class="bi bi-diagram-3 text-muted"></i>
+                                    <span>@sol.EspecieDescricao @(!string.IsNullOrEmpty(sol.RacaDescricao) ? $"· {sol.RacaDescricao}" : "")</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(sol.IdadeEstimada))
+                            {
+                                <div class="sol-info-row">
+                                    <i class="bi bi-clock text-muted"></i>
+                                    <span>@sol.IdadeEstimada</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(sol.DescricaoAnimal))
+                            {
+                                <p class="sol-descricao">@sol.DescricaoAnimal</p>
+                            }
+
+                            @if (sol.Status == "Rejeitado" && !string.IsNullOrEmpty(sol.ObservacaoAdmin))
+                            {
+                                <div class="sol-obs-admin">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <strong>Motivo:</strong> @sol.ObservacaoAdmin
+                                </div>
+                            }
+
+                            @if (sol.Status == "Aprovado" && sol.AnimalId.HasValue)
+                            {
+                                <a asp-controller="Details" asp-action="Details"
+                                   asp-route-id="@sol.AnimalId"
+                                   class="sol-ver-animal">
+                                    <i class="bi bi-eye me-1"></i> Ver no catálogo
+                                </a>
+                            }
+                        </div>
+
+                        <div class="sol-card-footer">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            Enviado em @sol.DataSolicitacao.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="user-dash-empty">
+            <div class="user-dash-empty-icon">📋</div>
+            <h3>Nenhuma solicitação enviada</h3>
+            <p class="text-muted">Tem um pet que precisa de um lar? Envie uma solicitação para análise.</p>
+            <a asp-action="Create" class="btn-custom btn-orange mt-2">
+                <i class="bi bi-plus-circle me-2"></i> Enviar Primeira Solicitação
+            </a>
+        </div>
+    }
+</div>
+
+@section Styles {
+<style>
+/* ── Cards de solicitação ─────────────────────────────── */
+.sol-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.sol-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); }
+
+.sol-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 0;
+    gap: 8px;
+}
+
+.sol-animal-nome {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #0f172a;
+}
+
+.sol-status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 50px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.sol-status-pendente  { background: #fff7ed; color: #ea580c; }
+.sol-status-aprovado  { background: #f0fdf4; color: #16a34a; }
+.sol-status-rejeitado { background: #fef2f2; color: #dc2626; }
+
+.sol-card-body {
+    padding: 14px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sol-info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: #475569;
+}
+
+.sol-descricao {
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 4px 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sol-obs-admin {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    color: #b91c1c;
+    margin-top: 4px;
+}
+
+.sol-ver-animal {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.sol-ver-animal:hover { text-decoration: underline; }
+
+.sol-card-footer {
+    padding: 10px 18px;
+    border-top: 1px solid #f8fafc;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+</style>
+}

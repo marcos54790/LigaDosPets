@@ -1,0 +1,110 @@
+﻿@model LigaDosPets.Application.DTOs.Usuario.CompletarPerfilDto
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Completar Perfil";
+}
+
+<section class="user-dash-hero">
+    <div class="container">
+        <h1 class="user-dash-title">Habilitação de Doador 📋</h1>
+        <p class="user-dash-sub">Preencha seus dados para cadastrar pets para adoção</p>
+    </div>
+</section>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            @* Aviso legal *@
+            <div class="perfil-aviso mb-4">
+                <i class="bi bi-shield-lock-fill me-2 text-primary"></i>
+                Para garantir a segurança dos pets e cumprir a <strong>Lei 14.064/20</strong>, precisamos validar sua identidade antes do primeiro cadastro. Seus dados são protegidos pela nossa política de privacidade.
+            </div>
+
+            <div class="perfil-card">
+                <form asp-action="CompletarPerfil" asp-controller="Usuario" method="post" id="formDoador">
+                    @Html.AntiForgeryToken()
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="auth-alert mb-4">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div asp-validation-summary="ModelOnly"></div>
+                        </div>
+                    }
+
+                    @* Contato *@
+                    <div class="perfil-section-label">Contato</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label class="perfil-label">WhatsApp / Telefone</label>
+                            <input asp-for="Telefone" class="form-control perfil-input" id="telefone"
+                                   placeholder="(00) 00000-0000" maxlength="15" />
+                            <span asp-validation-for="Telefone" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    @* Endereço *@
+                    <div class="perfil-section-label">Endereço</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="perfil-label">CEP</label>
+                            <input asp-for="Cep" class="form-control perfil-input" id="cep"
+                                   maxlength="9" placeholder="00000-000"
+                                   onblur="buscarEndereco(this.value)" />
+                            <span asp-validation-for="Cep" class="field-error"></span>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="perfil-label">Cidade / UF</label>
+                            <input id="cidadeUf" class="form-control perfil-input bg-light"
+                                   readonly placeholder="Preenchido automaticamente pelo CEP" />
+                        </div>
+                        <div class="col-12">
+                            <label class="perfil-label">Logradouro</label>
+                            <input id="ruaDisplay" class="form-control perfil-input bg-light"
+                                   readonly placeholder="Aguardando CEP..." />
+                        </div>
+
+                        @* Campos ocultos enviados ao servidor *@
+                        <input type="hidden" asp-for="Logradouro" id="logradouro" />
+                        <input type="hidden" asp-for="Bairro" id="bairro" />
+                        <input type="hidden" asp-for="Cidade" id="cidade" />
+                        <input type="hidden" asp-for="Estado" id="estado" />
+
+                        <div class="col-12">
+                            <label class="perfil-label">Número / Complemento</label>
+                            <input asp-for="Numero" class="form-control perfil-input"
+                                   placeholder="Ex: Casa 10, Bloco B" maxlength="100" />
+                            <span asp-validation-for="Numero" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    @* Termo *@
+                    <div class="perfil-termo">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox"
+                                   asp-for="AceitouTermos" id="aceiteLei" required />
+                            <label class="form-check-label small" for="aceiteLei">
+                                Declaro que as informações acima são verídicas e estou ciente da
+                                <a asp-controller="Home" asp-action="Privacy" target="_blank">Política de Privacidade</a>.
+                                O abandono é crime (Lei 14.064/20). Responsabilizo-me pela guarda do animal até a aprovação pela ONG.
+                            </label>
+                        </div>
+                        <span asp-validation-for="AceitouTermos" class="field-error d-block mt-1"></span>
+                    </div>
+
+                    <button type="submit" class="btn-custom btn-orange w-100 mt-4 py-3">
+                        <i class="bi bi-check-circle-fill me-2"></i> Validar e Habilitar Conta
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="~/js/perfil-doador.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Painel Liga dos Pets</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+</head>
+<body class="admin-body">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon">🐾</span>
+                <span class="sidebar-logo-text">Liga dos Pets</span>
+            </div>
+            <button class="sidebar-toggle-btn" id="sidebarToggle" title="Recolher menu">
+                <i class="bi bi-layout-sidebar-reverse"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Visão Geral</div>
+            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="sidebar-section-label mt-3">Gestão</div>
+            <a asp-area="Admin" asp-controller="Animais" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Animais" ? "active" : "")">
+                <i class="bi bi-heart-fill"></i>
+                <span>Pets</span>
+                @* Badge de pendentes pode ser injetado via ViewBag futuramente *@
+            </a>
+
+            <a asp-area="Admin" asp-controller="Especies" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Especies" ? "active" : "")">
+                <i class="bi bi-diagram-3-fill"></i>
+                <span>Espécies</span>
+            </a>
+
+            <a asp-area="Admin" asp-controller="Racas" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Racas" ? "active" : "")">
+                <i class="bi bi-tags-fill"></i>
+                <span>Raças</span>
+            </a>
+            <a asp-area="Admin" asp-controller="Caracteristicas" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Caracteristicas" ? "active" : "")">
+                <i class="bi bi-puzzle-fill"></i>
+                <span>Características</span>
+            </a>
+
+            <a asp-area="Admin" asp-controller="Usuarios" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Usuarios" ? "active" : "")">
+                <i class="bi bi-people-fill"></i>
+                <span>Usuários</span>
+            </a>
+            <a asp-area="Admin" asp-controller="Solicitacoes" asp-action="Index"
+                   class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Solicitacoes" ? "active" : "")">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Solicitações</span>
+            </a>
+            <a asp-area="Admin" asp-controller="Agendamentos" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Agendamentos" ? "active" : "")">
+                <i class="bi bi-calendar-check-fill"></i>
+                <span>Agendamentos</span>
+            </a>
+            <div class="sidebar-section-label mt-3">Comunicação</div>
+            <a asp-area="Admin" asp-controller="Conversas" asp-action="Index"
+               class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Conversas" ? "active" : "")">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Central de Mensagens</span>
+            </a>
+
+            <div class="sidebar-divider"></div>
+            <a asp-controller="Home" asp-action="Index" asp-area="" class="sidebar-link sidebar-link-muted">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Voltar ao Site</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="sidebar-user-info">
+                    <span class="sidebar-user-name">@User.Identity?.Name</span>
+                    <span class="sidebar-user-role">Administrador</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="admin-main" id="adminMain">
+        <header class="admin-topbar">
+            <div class="topbar-left">
+                <button class="topbar-menu-btn" id="sidebarToggleMobile">
+                    <i class="bi bi-list"></i>
+                </button>
+                <nav aria-label="breadcrumb" class="d-none d-md-block">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Painel</a>
+                        </li>
+                        @if (ViewData["Title"] != null)
+                        {
+                            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                        }
+                    </ol>
+                </nav>
+            </div>
+            <div class="topbar-right">
+                <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="mb-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="topbar-logout-btn">
+                        <i class="bi bi-power"></i>
+                        <span class="d-none d-md-inline">Sair</span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main class="admin-content">
+            @if (TempData["Sucesso"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["Sucesso"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Erro"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Erro"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Toggle sidebar collapsed
+        const sidebar = document.getElementById('adminSidebar');
+        const main = document.getElementById('adminMain');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const toggleMobile = document.getElementById('sidebarToggleMobile');
+
+        toggleBtn?.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+
+        toggleMobile?.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+
+        // Restaura estado do sidebar
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            main.classList.add('expanded');
+        }
+    </script>
+</body>
+</html>

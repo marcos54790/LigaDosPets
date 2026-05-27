@@ -1,0 +1,155 @@
+﻿@model LigaDosPets.Web.Models.ViewModels.DashboardModel
+@using System.Text.Json
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Dashboard";
+
+    // Serializar aqui para evitar problema de encoding no HTML
+    var especiesLabels = JsonSerializer.Serialize(Model.LabelsEspecies);
+    var especiesValores = JsonSerializer.Serialize(Model.ValoresEspecies);
+    var portesLabels = JsonSerializer.Serialize(Model.LabelsPortes);
+    var portesValores = JsonSerializer.Serialize(Model.ValoresPortes);
+    var mesesLabels = JsonSerializer.Serialize(Model.LabelsMeses);
+    var mesesValores = JsonSerializer.Serialize(Model.ValoresCadastrosMes);
+}
+
+@* Dados para o JS — sem asp-append-version, sem HTML encode *@
+<script id="dashboardData" type="application/json">
+    {
+        "especiesLabels":  @Html.Raw(especiesLabels),
+        "especiesValores": @Html.Raw(especiesValores),
+        "portesLabels":    @Html.Raw(portesLabels),
+        "portesValores":   @Html.Raw(portesValores),
+        "sexoMachos":      @Model.TotalMachos,
+        "sexoFemeas":      @Model.TotalFemeas,
+        "mesesLabels":     @Html.Raw(mesesLabels),
+        "mesesValores":    @Html.Raw(mesesValores)
+    }
+</script>
+
+<!-- ── Cabeçalho ─────────────────────────────────────────── -->
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h4 class="fw-bold mb-0" style="color:#0f172a; font-family:'Fredoka',sans-serif;">
+            Visão Geral da Liga 🐾
+        </h4>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">
+            Atualizado em @DateTime.Now.ToString("dd/MM/yyyy 'às' HH:mm")
+        </p>
+    </div>
+</div>
+
+<!-- ── Cards de Estatística ──────────────────────────────── -->
+<div class="admin-section-title">Métricas principais</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-heart-fill"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Disponíveis</span>
+                <span class="stat-value">@Model.TotalAnimais</span>
+                <span class="stat-sub">no catálogo</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="bi bi-house-heart-fill"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Adotados</span>
+                <span class="stat-value">@Model.TotalAdotados</span>
+                <span class="stat-sub">total histórico</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Pendentes</span>
+                <span class="stat-value">@Model.TotalPendentesValidacao</span>
+                <span class="stat-sub">aguardando revisão</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Usuários</span>
+                <span class="stat-value">@Model.TotalUsuarios</span>
+                <span class="stat-sub">cadastrados</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-calendar-check-fill"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Visitas</span>
+                <span class="stat-value">@Model.TotalAgendamentos</span>
+                <span class="stat-sub">agendamentos</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="bi bi-inbox-fill"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Solicitações</span>
+                <span class="stat-value">@Model.TotalSolicitacoesPendentes</span>
+                <span class="stat-sub">pendentes</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Gráficos — Linha 1 ─────────────────────────────────── -->
+<div class="admin-section-title">Distribuição</div>
+<div class="row g-3 mb-3">
+    <div class="col-md-5 col-xl-4">
+        <div class="chart-card">
+            <div class="chart-card-title">Por Espécie</div>
+            <div class="chart-card-subtitle">Animais disponíveis agrupados por espécie</div>
+            <div style="position:relative; height:220px;">
+                <canvas id="chartEspecies"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-xl-2">
+        <div class="chart-card">
+            <div class="chart-card-title">Por Sexo</div>
+            <div class="chart-card-subtitle">Machos vs Fêmeas</div>
+            <div style="position:relative; height:220px;">
+                <canvas id="chartSexo"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-6">
+        <div class="chart-card">
+            <div class="chart-card-title">Por Porte</div>
+            <div class="chart-card-subtitle">Pequeno, Médio e Grande</div>
+            <div style="position:relative; height:220px;">
+                <canvas id="chartPortes"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Gráficos — Linha 2 ─────────────────────────────────── -->
+<div class="admin-section-title">Evolução</div>
+<div class="row g-3">
+    <div class="col-12">
+        <div class="chart-card">
+            <div class="chart-card-title">Cadastros nos últimos 6 meses</div>
+            <div class="chart-card-subtitle">Novos animais cadastrados por mês</div>
+            <div style="position:relative; height:180px;">
+                <canvas id="chartMeses"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-charts.js" asp-append-version="true"></script>
+}

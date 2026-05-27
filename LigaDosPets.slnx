@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Documentação/">
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="LigaDosPets.API/LigaDosPets.API.csproj" />
+  <Project Path="LigaDosPets.Application/LigaDosPets.Application.csproj" />
+  <Project Path="LigaDosPets.Domain/LigaDosPets.Domain.csproj" />
+  <Project Path="LigaDosPets.Infrastructure/LigaDosPets.Infrastructure.csproj" />
+  <Project Path="LigaDosPets.Web/LigaDosPets.Web.csproj" />
+</Solution>

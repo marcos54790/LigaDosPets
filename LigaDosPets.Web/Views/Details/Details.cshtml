@@ -1,0 +1,179 @@
+﻿@model LigaDosPets.Web.Models.DetailsModel
+@{
+    ViewData["Title"] = Model.Nome + " — Liga dos Pets";
+}
+
+<div class="details-wrapper">
+    <div class="container py-5">
+
+        @* ── Breadcrumb ──────────────────────────────────────────── *@
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Animais" asp-action="Index">Catálogo</a></li>
+                <li class="breadcrumb-item active">@Model.Nome</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5 align-items-start">
+
+            @* ── Coluna Esquerda: Fotos ───────────────────────────── *@
+            <div class="col-lg-5">
+                <div class="details-photo-block">
+                    @if (Model.Fotos != null && Model.Fotos.Any())
+                    {
+                        var temMultiplasFotos = Model.Fotos.Count > 1;
+                        <div id="carouselFotos" class="carousel slide rounded-4 overflow-hidden shadow-lg"
+                             data-bs-ride="@(temMultiplasFotos ? "carousel" : "false")">
+
+                            @if (temMultiplasFotos)
+                            {
+                                <div class="carousel-indicators">
+                                    @for (int i = 0; i < Model.Fotos.Count; i++)
+                                    {
+                                        <button type="button" data-bs-target="#carouselFotos"
+                                                data-bs-slide-to="@i"
+                                                class="@(i == 0 ? "active" : "")"
+                                                aria-label="Foto @(i+1)"></button>
+                                    }
+                                </div>
+                            }
+
+                            <div class="carousel-inner">
+                                @for (int i = 0; i < Model.Fotos.Count; i++)
+                                {
+                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                        <img src="@Model.Fotos[i].Url"
+                                             class="d-block w-100 pet-details-image"
+                                             alt="@Model.Nome - Foto @(i+1)"
+                                             onerror="this.src='/images/pets/placeholder.jpg'">
+                                    </div>
+                                }
+                            </div>
+
+                            @if (temMultiplasFotos)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselFotos" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon details-carousel-btn" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Anterior</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselFotos" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon details-carousel-btn" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Próximo</span>
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rounded-4 overflow-hidden shadow-lg">
+                            <img src="/images/pets/placeholder.jpg" class="img-fluid w-100" alt="Sem foto">
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* ── Coluna Direita: Informações ──────────────────────── *@
+            <div class="col-lg-7">
+
+                @* Badges de espécie / raça / porte *@
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="details-badge details-badge-primary">@Model.EspecieNome</span>
+                    <span class="details-badge details-badge-info">@Model.RacaNome</span>
+                    <span class="details-badge details-badge-secondary">@Model.PorteNome</span>
+                </div>
+
+                <h1 class="details-name">@Model.Nome</h1>
+
+                @* Cards de atributos *@
+                <div class="details-attrs-grid">
+                    <div class="details-attr">
+                        <span class="details-attr-label">Sexo</span>
+                        <span class="details-attr-value @(Model.Sexo == "Macho" ? "text-primary" : "text-danger")">
+                            <i class="bi @(Model.Sexo == "Macho" ? "bi-gender-male" : "bi-gender-female") me-1"></i>
+                            @Model.Sexo
+                        </span>
+                    </div>
+                    <div class="details-attr">
+                        <span class="details-attr-label">Idade</span>
+                        <span class="details-attr-value">
+                            @(Model.Idade.HasValue ? $"{Model.Idade} ano{(Model.Idade > 1 ? "s" : "")}" : "Não informada")
+                        </span>
+                    </div>
+                    <div class="details-attr">
+                        <span class="details-attr-label">Porte</span>
+                        <span class="details-attr-value">@Model.PorteNome</span>
+                    </div>
+                    <div class="details-attr">
+                        <span class="details-attr-label">Protetor</span>
+                        <span class="details-attr-value text-truncate">@Model.UsuarioCadastroNome</span>
+                    </div>
+                </div>
+
+                @* Descrição *@
+                @if (!string.IsNullOrEmpty(Model.Descricao))
+                {
+                    <div class="details-descricao">
+                        <h5 class="details-section-label">
+                            <i class="bi bi-heart-fill text-danger me-2"></i>Sobre @Model.Nome
+                        </h5>
+                        <p class="text-muted lh-lg mb-0">@Model.Descricao</p>
+                    </div>
+                }
+                @if (Model.Caracteristicas.Any())
+                {
+                    <div class="details-descricao mt-3">
+                        <h5 class="details-section-label">
+                            <i class="bi bi-patch-check-fill text-primary me-2"></i>Características
+                        </h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var c in Model.Caracteristicas)
+                            {
+                                <span class="details-caract-chip">
+                                    <i class="bi bi-check2 me-1"></i>@c
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+                @* Alerta de feedback *@
+                @if (TempData["Sucesso"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show rounded-3 mt-3" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Sucesso"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @* Ações *@
+                <div class="details-actions">
+                    @if (Model.DisponivelParaAdocao)
+                    {
+                        <button type="button"
+                                class="btn-custom btn-orange px-5 py-3 fw-bold shadow-sm"
+                                data-bs-toggle="modal" data-bs-target="#modalAgendamento">
+                            <i class="bi bi-calendar-check me-2"></i> Agendar Visita
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="details-adotado-badge">
+                            <i class="bi bi-house-heart-fill me-2"></i> Já encontrou um lar 🎉
+                        </span>
+                    }
+                    <a asp-action="Index" asp-controller="Animais"
+                       class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-500">
+                        <i class="bi bi-arrow-left me-1"></i> Voltar
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_ModalAgendamento" model="Model" />
+
+@section Scripts {
+    <script src="~/js/agendamento.js"></script>
+}

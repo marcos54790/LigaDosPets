@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "Sobre a Liga dos Pets";
+}
+
+<!-- Hero Secundário -->
+<section class="hero" style="padding: 80px 20px;">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3" style="font-family: var(--font-title);">Nossa História 🐾</h1>
+        <p class="lead mb-0">Conheça a missão que move cada patinha resgatada</p>
+    </div>
+</section>
+
+<!-- Conteúdo principal -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Missão e Visão -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <div class="text-primary mb-3" style="font-size: 2.5rem;">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3" style="font-family: var(--font-title);">Missão</h3>
+                        <p class="text-muted">
+                            Conectar animais abandonados a famílias responsáveis através de uma plataforma transparente e acolhedora.
+                            Facilitamos o processo de adoção e doação, garantindo que cada animal receba o cuidado e o lar que merece.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                        <div class="text-primary mb-3" style="font-size: 2.5rem;">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3" style="font-family: var(--font-title);">Visão</h3>
+                        <p class="text-muted">
+                            Ser a principal plataforma de adoção animal do Brasil, reduzindo o abandono e promovendo uma cultura de respeito e amor aos pets.
+                            Queremos um futuro onde nenhum animal saudável fique sem um lar.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Como funciona -->
+            <h2 class="fw-bold mb-4 text-center" style="font-family: var(--font-title); color: var(--color-primary);">Como Funciona?</h2>
+            <div class="row g-4 mb-5">
+                <div class="col-md-4 text-center">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-search-heart text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">1. Explore</h5>
+                    <p class="text-muted small">Navegue pelo catálogo de animais disponíveis e encontre seu novo melhor amigo.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-calendar2-check text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">2. Agende</h5>
+                    <p class="text-muted small">Marque uma visita ao abrigo para conhecer o animal pessoalmente.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-house-heart text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="fw-bold">3. Adote</h5>
+                    <p class="text-muted small">Complete a adoção com nosso suporte e dê um lar cheio de amor.</p>
+                </div>
+            </div>
+
+            <!-- Valores -->
+            <h2 class="fw-bold mb-4 text-center" style="font-family: var(--font-title); color: var(--color-primary);">Nossos Valores</h2>
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-heart-fill text-danger me-2"></i>
+                            <strong>Amor incondicional:</strong> Cada animal merece respeito e carinho.
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-shield-check text-success me-2"></i>
+                            <strong>Responsabilidade:</strong> Adoção consciente, com acompanhamento pós-adoção.
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-people-fill text-primary me-2"></i>
+                            <strong>Comunidade:</strong> Unimos esforços de ONGs, protetores e adotantes.
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-lightbulb text-warning me-2"></i>
+                            <strong>Inovação:</strong> Tecnologia a serviço da causa animal.
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-graph-up text-info me-2"></i>
+                            <strong>Transparência:</strong> Processos claros e comunicação aberta.
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-globe2 text-secondary me-2"></i>
+                            <strong>Sustentabilidade:</strong> Práticas que respeitam o meio ambiente e os animais.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Chamada final -->
+            <div class="text-center bg-primary text-white rounded-4 p-5 shadow">
+                <h3 class="fw-bold mb-3">Faça parte dessa corrente do bem!</h3>
+                <p class="mb-4">Cadastre-se, adote ou divulgue um animal que precisa de ajuda.</p>
+                <a asp-controller="Animais" asp-action="Index" class="btn btn-light btn-lg rounded-pill px-5 fw-bold">
+                    Ver Animais Disponíveis
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>

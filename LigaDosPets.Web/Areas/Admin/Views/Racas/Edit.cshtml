@@ -1,0 +1,71 @@
+﻿@model LigaDosPets.Application.DTOs.Raca.UpdateRacaDto
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Editar Raça";
+    var racaId = ViewBag.RacaId as int? ?? 0;
+    var racaNome = ViewBag.RacaNome as string ?? "Raça";
+    var especieIdAtual = ViewBag.EspecieIdAtual as int?;
+}
+
+<div class="crud-page-header">
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Index" class="crud-back-btn">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="crud-page-title">Editar: @racaNome</h4>
+            <p class="crud-page-sub">Altere o nome ou a espécie vinculada.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="crud-form-card">
+            <form asp-action="Edit" asp-route-id="@racaId" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="crud-form-section" style="border:none; padding:0; margin:0;">
+                    <div class="crud-form-section-title">Dados da raça</div>
+                    <div class="mb-3">
+                        <label class="crud-label">Nome da raça</label>
+                        <input asp-for="Nome" class="form-control crud-input" autofocus />
+                        <span asp-validation-for="Nome" class="field-error"></span>
+                    </div>
+
+                    <!-- Espécie (informativo, não alterável via UpdateRacaDto comum) -->
+                    <div class="mb-3">
+                        <label class="crud-label">Espécie atual</label>
+                        <select class="form-select crud-input" disabled>
+                            @foreach (var e in (IEnumerable<dynamic>)ViewBag.Especies)
+                            {
+                                @if (e.Id == especieIdAtual)
+                                {
+                                    <option value="@e.Id" selected>@e.Nome</option>
+                                }
+                                else
+                                {
+                                    <option value="@e.Id">@e.Nome</option>
+                                }
+                            }
+                        </select>
+                        <small class="text-muted">A troca de espécie não está disponível nesta edição.</small>
+                    </div>
+                </div>
+
+                <div class="crud-form-actions" style="border:none; padding-top:16px; margin-top:8px;">
+                    <a asp-action="Index" class="text-muted text-decoration-none fw-500">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-custom btn-orange px-5 py-2">
+                        <i class="bi bi-floppy me-2"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

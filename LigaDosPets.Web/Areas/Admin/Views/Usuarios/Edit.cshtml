@@ -1,0 +1,83 @@
+﻿@model LigaDosPets.Application.DTOs.Usuario.UpdateUsuarioDto
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Editar Usuário";
+    var usuarioId = ViewBag.UsuarioId as int? ?? 0;
+    var usuarioNome = ViewBag.UsuarioNome as string ?? "Usuário";
+    var usuarioEmail = ViewBag.UsuarioEmail as string ?? "";
+    var tipoUsuario = ViewBag.TipoUsuario as string ?? "";
+    var ativo = ViewBag.Ativo as bool? ?? true;
+}
+
+<div class="crud-page-header">
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Index" class="crud-back-btn">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="crud-page-title">Editar: @usuarioNome</h4>
+            <p class="crud-page-sub">Altere o nome do usuário. E-mail e tipo não podem ser alterados.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="crud-form-card">
+            <form asp-action="Edit" asp-route-id="@usuarioId" method="post">
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="auth-alert mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div asp-validation-summary="ModelOnly"></div>
+                    </div>
+                }
+
+                <div class="crud-form-section" style="border:none; padding:0; margin:0;">
+                    <div class="crud-form-section-title">Dados do usuário</div>
+
+                    <div class="mb-3">
+                        <label class="crud-label">Nome</label>
+                        <input asp-for="Nome" class="form-control crud-input" autofocus />
+                        <span asp-validation-for="Nome" class="field-error"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="crud-label">E-mail</label>
+                        <input class="form-control crud-input" value="@usuarioEmail" readonly disabled />
+                        <small class="text-muted">O e-mail não pode ser alterado.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="crud-label">Tipo de Usuário</label>
+                        <input class="form-control crud-input" value="@tipoUsuario" readonly disabled />
+                        <small class="text-muted">O tipo de usuário não pode ser alterado.</small>
+                    </div>
+
+                    @* Campo Telefone REMOVIDO *@
+
+                    <div class="mb-3">
+                        <label class="crud-label">Status</label>
+                        <input class="form-control crud-input" value="@(ativo ? "Ativo" : "Inativo")" readonly disabled />
+                        <small class="text-muted">Use os botões de ação na lista para ativar/desativar.</small>
+                    </div>
+                </div>
+
+                <div class="crud-form-actions" style="border:none; padding-top:16px; margin-top:8px;">
+                    <a asp-action="Index" class="text-muted text-decoration-none fw-500">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-custom btn-orange px-5 py-2">
+                        <i class="bi bi-floppy me-2"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

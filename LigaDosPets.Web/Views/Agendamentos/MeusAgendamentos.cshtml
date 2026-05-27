@@ -1,0 +1,123 @@
+﻿@model IEnumerable<LigaDosPets.Application.DTOs.Agendamento.AgendamentoDto>
+@{
+    ViewData["Title"] = "Meus Agendamentos";
+}
+
+<div class="container py-5">
+    <h3 class="fw-bold mb-1">📅 Meus Agendamentos</h3>
+    <p class="text-muted mb-4">Acompanhe suas visitas agendadas.</p>
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success rounded-3">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Sucesso"]
+        </div>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger rounded-3">
+            <i class="bi bi-x-circle-fill me-2"></i>@TempData["Erro"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div style="font-size:3rem">📭</div>
+            <h5 class="mt-3">Nenhum agendamento ainda</h5>
+            <a asp-controller="Animais" asp-action="Index" class="btn btn-orange mt-2">
+                Ver animais disponíveis
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var ag in Model)
+            {
+                var podeCancelar = ag.Status == "Pendente" || ag.Status == "Confirmado";
+                var statusClass = ag.Status switch
+                {
+                    "Confirmado" => "success",
+                    "Realizado" => "primary",
+                    "Cancelado" => "secondary",
+                    _ => "warning"
+                };
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="fw-bold mb-0">@ag.NomeAnimal</h5>
+                                <span class="badge bg-@statusClass rounded-pill">@ag.Status</span>
+                            </div>
+                            <p class="text-muted small mb-1">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                @ag.DataVisita.ToString("dd/MM/yyyy 'às' HH:mm")
+                            </p>
+                            @if (!string.IsNullOrEmpty(ag.Observacao))
+                            {
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-chat-left-text me-1"></i>@ag.Observacao
+                                </p>
+                            }
+                        </div>
+                        @if (podeCancelar)
+                        {
+                            <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm rounded-pill w-100"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalCancelar"
+                                        data-id="@ag.Id"
+                                        data-animal="@ag.NomeAnimal">
+                                    <i class="bi bi-x-circle me-1"></i> Cancelar visita
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@* Modal cancelar *@
+<div class="modal fade" id="modalCancelar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-danger">Cancelar agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCancelar" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <p class="text-muted mb-3">
+                        Cancelar visita para ver <strong id="nomeAnimalModal"></strong>?
+                    </p>
+                    <textarea name="motivo" class="form-control rounded-3" rows="2"
+                              placeholder="Motivo (opcional)"></textarea>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">
+                        Voltar
+                    </button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
+                        Confirmar cancelamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('modalCancelar')?.addEventListener('show.bs.modal', e => {
+            const btn = e.relatedTarget;
+            document.getElementById('nomeAnimalModal').textContent = btn.dataset.animal;
+            document.getElementById('formCancelar').action = '/Agendamentos/Cancelar/' + btn.dataset.id;
+        });
+    </script>
+}

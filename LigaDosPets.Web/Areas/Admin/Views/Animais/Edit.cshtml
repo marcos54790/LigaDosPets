@@ -1,0 +1,145 @@
+﻿@model LigaDosPets.Application.DTOs.Animal.UpdateAnimalDto
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Editar Pet";
+    var animalId = ViewBag.AnimalId as int? ?? 0;
+    var animalNome = ViewBag.AnimalNome as string ?? "Animal";
+}
+
+<div class="crud-page-header">
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Index" class="crud-back-btn">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="crud-page-title">Editar: @animalNome</h4>
+            <p class="crud-page-sub">Alterações são salvas e refletidas imediatamente no catálogo.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-xl-9">
+        <div class="crud-form-card">
+            <form asp-action="Edit" asp-route-id="@animalId" method="post" id="formEditAnimal">
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="auth-alert mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div asp-validation-summary="ModelOnly"></div>
+                    </div>
+                }
+
+                @* Informações básicas *@
+                <div class="crud-form-section">
+                    <div class="crud-form-section-title">Informações básicas</div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="crud-label">Nome do animal</label>
+                            <input asp-for="Nome" class="form-control crud-input" />
+                            <span asp-validation-for="Nome" class="field-error"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="crud-label">Idade (anos)</label>
+                            <input asp-for="Idade" type="number" min="0" max="100"
+                                   class="form-control crud-input" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="crud-label">Sexo</label>
+                            <select asp-for="Sexo" class="form-select crud-input">
+                                <option value="Macho">Macho</option>
+                                <option value="Fêmea">Fêmea</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                @* Categorização *@
+                <div class="crud-form-section">
+                    <div class="crud-form-section-title">Categorização</div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="crud-label">Espécie</label>
+                            <select asp-for="EspecieId" id="selectEspecie" class="form-select crud-input">
+                                <option value="">Selecione...</option>
+                                @foreach (var e in (IEnumerable<dynamic>)ViewBag.Especies)
+                                {
+                                    <option value="@e.Id">@e.Nome</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="crud-label">Raça</label>
+                            <select asp-for="RacaId" id="selectRaca" class="form-select crud-input">
+                                <option value="">SRD / Sem raça definida</option>
+                                @if (ViewBag.RacasEspecie != null)
+                                {
+                                    foreach (var r in (IEnumerable<dynamic>)ViewBag.RacasEspecie)
+                                    {
+                                        <option value="@r.Id">@r.Nome</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="crud-label">Porte</label>
+                            <select asp-for="PorteId" class="form-select crud-input">
+                                @foreach (var p in (IEnumerable<dynamic>)ViewBag.Portes)
+                                {
+                                    <option value="@p.Id">@p.Nome</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                @* Características *@
+                <div class="crud-form-section">
+                    <div class="crud-form-section-title">Características</div>
+                    <div class="crud-tags">
+                        @foreach (var item in (IEnumerable<dynamic>)ViewBag.Caracteristicas)
+                        {
+                            var selecionado = Model.CaracteristicasIds?.Contains((int)item.Id) ?? false;
+                            <div>
+                                <input type="checkbox" name="CaracteristicasIds"
+                                       value="@item.Id" id="ctag_@item.Id" class="btn-check"
+                                @(selecionado ? "checked" : "") />
+                                <label class="crud-tag-label" for="ctag_@item.Id">
+                                    <i class="bi bi-check2 me-1"></i>@item.Nome
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @* Textos *@
+                <div class="crud-form-section">
+                    <div class="crud-form-section-title">Sobre o animal</div>
+                    <div class="col-12">
+                        <label class="crud-label">Descrição</label>
+                        <textarea asp-for="Descricao" class="form-control crud-input" rows="5"
+                                  placeholder="Personalidade, comportamento, preferências..."></textarea>
+                        <span asp-validation-for="Descricao" class="field-error"></span>
+                    </div>
+                </div>
+
+                @* Ações *@
+                <div class="crud-form-actions">
+                    <a asp-action="Index" class="text-muted text-decoration-none fw-500">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-custom btn-orange px-5 py-3">
+                        <i class="bi bi-floppy me-2"></i> Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/raca-dinamica.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

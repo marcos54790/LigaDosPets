@@ -1,0 +1,92 @@
+﻿@model LigaDosPets.Web.Models.UsuarioViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Novo Usuário";
+}
+
+<div class="crud-page-header">
+    <div class="d-flex align-items-center gap-3">
+        <a asp-action="Index" class="crud-back-btn">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="crud-page-title">Novo Usuário</h4>
+            <p class="crud-page-sub">Cadastre um novo usuário no sistema.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="crud-form-card">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="auth-alert mb-4">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div asp-validation-summary="ModelOnly"></div>
+                    </div>
+                }
+
+                <div class="crud-form-section" style="border:none; padding:0; margin:0;">
+                    <div class="crud-form-section-title">Dados do usuário</div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="crud-label">Nome</label>
+                            <input asp-for="Nome" class="form-control crud-input" autofocus />
+                            <span asp-validation-for="Nome" class="field-error"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="crud-label">E-mail</label>
+                            <input asp-for="Email" class="form-control crud-input" type="email" />
+                            <span asp-validation-for="Email" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <label class="crud-label">Senha</label>
+                            <input asp-for="Senha" class="form-control crud-input" type="password" />
+                            <span asp-validation-for="Senha" class="field-error"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="crud-label">Telefone</label>
+                            <input asp-for="Telefone" class="form-control crud-input" />
+                            <span asp-validation-for="Telefone" class="field-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <label class="crud-label">Tipo de Usuário</label>
+                            <select asp-for="TipoUsuarioId" class="form-select crud-input">
+                                <option value="">Selecione...</option>
+                                @foreach (var tipo in (IEnumerable<dynamic>)ViewBag.TiposUsuarios)
+                                {
+                                    <option value="@tipo.Id">@tipo.Nome</option>
+                                }
+                            </select>
+                            <span asp-validation-for="TipoUsuarioId" class="field-error"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="crud-form-actions" style="border:none; padding-top:16px; margin-top:8px;">
+                    <a asp-action="Index" class="text-muted text-decoration-none fw-500">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-custom btn-orange px-5 py-3">
+                        <i class="bi bi-check-circle me-2"></i> Criar Usuário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,145 @@
+﻿@model IEnumerable<LigaDosPets.Web.Models.AnimalModel>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Meu Painel";
+}
+
+@* ── Cabeçalho da página ──────────────────────────────────── *@
+@* ── Cabeçalho da página ──────────────────────────────────── *@
+<section class="user-dash-hero">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="user-dash-title">Meu Painel 🐾</h1>
+                <p class="user-dash-sub">Gerencie os pets que você cadastrou para adoção</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a asp-controller="Solicitacoes" asp-action="Index" class="btn-custom btn-blue-outline shadow-sm">
+                    <i class="bi bi-list-check me-2"></i> Minhas Solicitações
+                </a>
+                <a asp-controller="Solicitacoes" asp-action="Create" class="btn-custom btn-orange shadow">
+                    <i class="bi bi-plus-circle me-2"></i> Cadastrar Pet para Doação
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container user-dash-body">
+
+    @* ── Cards de resumo ──────────────────────────────────────── *@
+    @{
+        var total     = Model?.Count() ?? 0;
+        var ativos    = Model?.Count(a => a.DisponivelParaAdocao && !a.AguardandoValidacao) ?? 0;
+        var pendentes = Model?.Count(a => a.AguardandoValidacao) ?? 0;
+    }
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-md-4">
+            <div class="user-stat-card">
+                <div class="user-stat-icon blue"><i class="bi bi-heart-fill"></i></div>
+                <div>
+                    <div class="user-stat-value">@total</div>
+                    <div class="user-stat-label">Total cadastrado@(total != 1 ? "s" : "")</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="user-stat-card">
+                <div class="user-stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="user-stat-value">@ativos</div>
+                    <div class="user-stat-label">No catálogo</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="user-stat-card">
+                <div class="user-stat-icon orange"><i class="bi bi-hourglass-split"></i></div>
+                <div>
+                    <div class="user-stat-value">@pendentes</div>
+                    <div class="user-stat-label">Aguardando revisão</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ── Lista de pets ────────────────────────────────────────── *@
+    @if (Model == null || !Model.Any())
+    {
+        <div class="user-dash-empty">
+            <div class="user-dash-empty-icon">🐾</div>
+            <h3>Você ainda não cadastrou nenhum pet</h3>
+            <p class="text-muted">Ajude um animal a encontrar um lar. Cadastre e nossa equipe vai revisar em breve.</p>
+            <a asp-controller="Solicitacoes" asp-action="Create" class="btn-custom btn-orange shadow">
+                <i class="bi bi-plus-circle me-2"></i> Cadastrar meu primeiro pet
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="user-dash-section-title">Seus pets cadastrados</div>
+        <div class="row g-4">
+            @foreach (var animal in Model)
+            {
+                <div class="col-sm-6 col-lg-4">
+                    <div class="user-pet-card">
+                        <div class="user-pet-img-wrap">
+                            <img src="@animal.FotoUrl" alt="@animal.Nome"
+                                 onerror="this.src='/images/pets/placeholder.jpg'">
+                            @* Badge de status *@
+                            @if (animal.AguardandoValidacao)
+                            {
+                                <span class="user-pet-status pending">
+                                    <i class="bi bi-hourglass-split me-1"></i>Aguardando revisão
+                                </span>
+                            }
+                            else if (animal.DisponivelParaAdocao)
+                            {
+                                <span class="user-pet-status active">
+                                    <i class="bi bi-check-circle me-1"></i>No catálogo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="user-pet-status adopted">
+                                    <i class="bi bi-house-heart me-1"></i>Adotado
+                                </span>
+                            }
+                        </div>
+                        <div class="user-pet-info">
+                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                <h5 class="user-pet-name">@animal.Nome</h5>
+                                <span class="user-pet-especie">@animal.EspecieNome</span>
+                            </div>
+                            <p class="user-pet-meta">
+                                @animal.RacaNome
+                                @if (animal.Idade.HasValue)
+                                {
+                                    <span class="mx-1">·</span>
+                                    @($"{animal.Idade} ano{(animal.Idade > 1 ? "s" : "")}")
+                                }
+                                <span class="mx-1">·</span>
+                                @animal.Sexo
+                            </p>
+
+                            @if (animal.AguardandoValidacao)
+                            {
+                                <div class="user-pet-notice">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Seu pet está em análise pela equipe da Liga. Você será notificado em breve.
+                                </div>
+                            }
+
+                            <div class="user-pet-actions">
+                                <a asp-controller="Details" asp-action="Details" asp-route-id="@animal.Id"
+                                   class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="bi bi-eye me-1"></i> Ver
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

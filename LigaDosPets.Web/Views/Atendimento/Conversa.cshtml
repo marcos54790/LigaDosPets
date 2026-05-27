@@ -1,0 +1,73 @@
+@model IEnumerable<LigaDosPets.Application.DTOs.Conversa.MensagemDto>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Atendimento";
+    var conversaId = (int)ViewBag.ConversaId;
+    var usuarioId = (int)ViewBag.UsuarioId;
+}
+
+<div class="chat-page-wrap">
+    <div class="chat-page-header">
+        <div class="d-flex align-items-center gap-3">
+            <a asp-action="Index" class="crud-back-btn">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div class="chat-avatar admin">
+                <i class="bi bi-headset"></i>
+            </div>
+            <div>
+                <div class="chat-page-nome">Suporte Liga dos Pets</div>
+                <div class="chat-page-status">
+                    <span class="chat-online-dot"></span> Online
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-messages-area" id="chatMessages">
+        @foreach (var msg in Model)
+        {
+            var isMeu = msg.RemetenteId == usuarioId;
+            <div class="chat-msg @(isMeu ? "meu" : "deles")">
+                @if (!isMeu)
+                {
+                    <div class="chat-msg-avatar">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                }
+                <div class="chat-msg-bubble">
+                    <div class="chat-msg-text">@msg.Conteudo</div>
+                    <div class="chat-msg-time">@msg.DataEnvio.ToString("HH:mm")</div>
+                </div>
+            </div>
+        }
+        <div id="digitandoIndicador" class="chat-digitando d-none">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+
+    <div class="chat-input-area">
+        <div class="chat-input-wrap">
+            <textarea id="inputMensagem"
+                      class="chat-textarea"
+                      placeholder="Digite sua mensagem..."
+                      rows="1"
+                      maxlength="500"></textarea>
+            <button id="btnEnviar" class="chat-send-btn">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script src="~/js/chat.js"></script>
+    <script>
+        ChatLiga.init({
+        conversaId: @conversaId,
+        usuarioId:  @usuarioId,
+        isAdmin:    false
+        });
+    </script>
+}

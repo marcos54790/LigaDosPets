@@ -1,0 +1,65 @@
+﻿@model IEnumerable<LigaDosPets.Application.DTOs.SolicitacaoEntrega.SolicitacaoDto>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Solicitações de Entrega";
+}
+
+<div class="crud-page-header">
+    <div>
+        <h4 class="crud-page-title">📦 Solicitações de Entrega</h4>
+        <p class="crud-page-sub">Gerencie os pedidos de doação enviados pelos usuários.</p>
+    </div>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="crud-table-wrap">
+        <table class="crud-table">
+            <thead>
+                <tr>
+                    <th>Animal</th>
+                    <th>Usuário</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sol in Model)
+                {
+                    <tr>
+                        <td>
+                            <span class="crud-animal-name">@sol.NomeAnimal</span>
+                            @if (!string.IsNullOrEmpty(sol.EspecieDescricao))
+                            {
+                                <br />
+                                <small class="text-muted">@sol.EspecieDescricao</small>
+                            }
+                        </td>
+                        <td>@sol.NomeUsuario</td>
+                        <td>@sol.DataSolicitacao.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="crud-badge crud-badge-orange">Pendente</span>
+                        </td>
+                        <td>
+                            <div class="crud-actions">
+                                <a asp-action="Detalhes" asp-route-id="@sol.Id"
+                                       class="crud-action-btn edit" title="Analisar">
+                                    <i class="bi bi-search"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="crud-empty">
+        <div class="crud-empty-icon">📦</div>
+        <h4>Nenhuma solicitação pendente</h4>
+        <p class="text-muted">Todas as solicitações foram atendidas.</p>
+    </div>
+}

@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Política de Privacidade";
+}
+
+<!-- Hero Secundário -->
+<section class="hero" style="padding: 80px 20px;">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3" style="font-family: var(--font-title);">Política de Privacidade 🔒</h1>
+        <p class="lead mb-0">Saiba como seus dados são protegidos na Liga dos Pets</p>
+    </div>
+</section>
+
+<!-- Conteúdo principal -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+                <h2 class="fw-bold mb-4" style="font-family: var(--font-title); color: var(--color-primary);">
+                    <i class="bi bi-shield-lock-fill me-2"></i>Compromisso com sua Privacidade
+                </h2>
+                <p class="text-muted lh-lg">
+                    A Liga dos Pets está comprometida em proteger a privacidade e a segurança dos dados pessoais de todos os usuários.
+                    Esta política explica como coletamos, usamos, armazenamos e protegemos suas informações.
+                </p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+                <h3 class="fw-bold mb-3">1. Dados Coletados</h3>
+                <ul class="list-unstyled text-muted lh-lg">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Nome e e-mail:</strong> fornecidos no cadastro, usados para identificação e comunicação.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Telefone e endereço (CEP, logradouro, etc.):</strong> necessários para validação do perfil de doador e contato da ONG.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Dados do animal:</strong> descrições, fotos e características cadastradas para divulgação no catálogo.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> <strong>Agendamentos:</strong> horários de visita registrados para organização da ONG.</li>
+                </ul>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+                <h3 class="fw-bold mb-3">2. Uso das Informações</h3>
+                <ul class="list-unstyled text-muted lh-lg">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Facilitar o processo de adoção e doação de animais.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Gerenciar agendamentos de visita e comunicação entre usuários e administradores.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Gerar estatísticas anônimas para melhoria da plataforma.</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Enviar notificações sobre status de solicitações e agendamentos.</li>
+                </ul>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+                <h3 class="fw-bold mb-3">3. Compartilhamento</h3>
+                <p class="text-muted lh-lg">
+                    Seus dados pessoais <strong>nunca</strong> são vendidos, alugados ou compartilhados com terceiros para fins comerciais.
+                    As informações são acessíveis apenas pela equipe administrativa da Liga dos Pets para fins operacionais (aprovação de solicitações, agendamentos, etc.).
+                </p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+                <h3 class="fw-bold mb-3">4. Segurança</h3>
+                <p class="text-muted lh-lg">
+                    Adotamos práticas de segurança padrão da indústria, como criptografia de senhas (hash) e comunicação via HTTPS,
+                    para proteger suas informações contra acesso não autorizado.
+                </p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-5 mb-4">
+                <h3 class="fw-bold mb-3">5. Seus Direitos</h3>
+                <p class="text-muted lh-lg">
+                    Você pode acessar, atualizar ou solicitar a exclusão de seus dados a qualquer momento através das configurações de conta
+                    ou entrando em contato conosco. Consulte também nossa página de <a asp-action="About">Sobre</a> para conhecer a missão do projeto.
+                </p>
+            </div>
+
+            <div class="text-center mt-5">
+                <a asp-action="Index" class="btn-custom btn-orange shadow">
+                    <i class="bi bi-arrow-left me-2"></i> Voltar para Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

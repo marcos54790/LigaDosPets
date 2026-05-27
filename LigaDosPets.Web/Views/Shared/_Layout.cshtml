@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Liga dos Pets</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="icon" type="image/x-icon" href="~/fav-icon.ico" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+
+    @* Permite que views individuais injetem CSS no <head> *@
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+    @* ── Navbar ──────────────────────────────────────────────── *@
+    <header>
+        <nav class="navbar navbar-expand-md navbar-dark shadow-sm">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/imagens/logo.png" alt="Liga dos Pets" height="40" />
+                    <span>Liga dos Pets</span>
+                </a>
+
+                <button class="navbar-toggler border-0" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                        aria-controls="navbarMain" aria-expanded="false" aria-label="Menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav ms-auto align-items-center gap-2 py-2 py-md-0">
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-home" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-fill me-1 d-none d-md-inline"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-catalogo" asp-area="" asp-controller="Animais" asp-action="Index">
+                                <i class="bi bi-heart-fill me-1 d-none d-md-inline"></i> Catálogo
+                            </a>
+                        </li>
+                        @* ── NOVO: Links públicos para Sobre e Privacidade ── *@
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-about" asp-area="" asp-controller="Home" asp-action="About">
+                                <i class="bi bi-bookmark-heart me-1 d-none d-md-inline"></i> Sobre
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-pill-about" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="bi bi-shield-lock me-1 d-none d-md-inline"></i> Privacidade
+                            </a>
+                        </li>
+                        @using Microsoft.AspNetCore.Identity
+                    @using LigaDosPets.Infrastructure.Identity
+                    @using LigaDosPets.Application.Abstractions.Services
+                    @inject SignInManager<ApplicationUser> SignInManager
+                    @inject UserManager<ApplicationUser> UserManager
+                    @inject IUsuarioService UsuarioService
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            var appUser = await UserManager.GetUserAsync(User);
+                            string nomeExibicao = appUser?.Email ?? "Usuário";
+
+                            if (appUser != null)
+                            {
+                                var perfil = await UsuarioService.GetPerfilPorApplicationUserIdAsync(appUser.Id);
+                                if (perfil != null && !string.IsNullOrWhiteSpace(perfil.Nome))
+                                    nomeExibicao = perfil.Nome;
+                            }
+
+                            // Primeira letra para o avatar
+                            var inicial = nomeExibicao.Length > 0 ? nomeExibicao[0].ToString().ToUpper() : "U";
+
+                            <li class="nav-item dropdown ms-1">
+                                <a class="nav-link nav-user-btn dropdown-toggle d-flex align-items-center gap-2"
+                                   href="#" id="userDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="nav-user-avatar">@inicial</span>
+                                    <span class="nav-user-name d-none d-md-inline">@nomeExibicao</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 p-2"
+                                    style="min-width: 230px;" aria-labelledby="userDropdown">
+
+                                    @* Header do dropdown *@
+                                    <li class="px-3 py-2">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="nav-user-avatar nav-user-avatar-lg">@inicial</div>
+                                            <div class="overflow-hidden">
+                                                <div class="fw-bold text-dark text-truncate" style="font-size:0.9rem;">@nomeExibicao</div>
+                                                <div class="text-muted" style="font-size:0.75rem;">@appUser?.Email</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider my-1 opacity-25"></li>
+
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3"
+                                           asp-area="" asp-controller="Dashboard" asp-action="Dashboard">
+                                            <span class="dropdown-item-icon bg-primary-subtle">
+                                                <i class="bi bi-grid-1x2-fill text-primary"></i>
+                                            </span>
+                                            <span class="fw-500">Meu Painel</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3"
+                                           asp-controller="Agendamentos" asp-action="MeusAgendamentos">
+                                            <span class="dropdown-item-icon bg-warning-subtle">
+                                                <i class="bi bi-calendar-check-fill text-warning"></i>
+                                            </span>
+                                            <span class="fw-500">Meus Agendamentos</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3"
+                                           asp-area="" asp-controller="Chat" asp-action="Index">
+                                            <span class="dropdown-item-icon bg-info-subtle">
+                                                <i class="bi bi-chat-dots-fill text-info"></i>
+                                            </span>
+                                            <span class="fw-500">Mensagens</span>
+                                        </a>
+                                    </li>
+
+                                    @if (User.IsInRole("Administrador") || User.IsInRole("Gerente"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3"
+                                               asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                                <span class="dropdown-item-icon bg-primary">
+                                                    <i class="bi bi-speedometer2 text-white"></i>
+                                                </span>
+                                                <span class="fw-500 text-primary">Painel Admin</span>
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <li><hr class="dropdown-divider my-1 opacity-25"></li>
+
+                                    <li>
+                                        <form asp-area="" asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    class="dropdown-item rounded-3 py-2 d-flex align-items-center gap-3 text-danger">
+                                                <span class="dropdown-item-icon bg-danger-subtle">
+                                                    <i class="bi bi-box-arrow-right text-danger"></i>
+                                                </span>
+                                                <span class="fw-bold">Sair da Conta</span>
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item ms-1">
+                                <a class="nav-link nav-login-btn" asp-controller="Auth" asp-action="Login">
+                                    <i class="bi bi-person-fill me-1"></i> Entrar
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    @* ── Alertas globais ──────────────────────────────────────── *@
+    @if (TempData["Sucesso"] != null || TempData["Erro"] != null)
+    {
+        <div class="container mt-3">
+            @if (TempData["Sucesso"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["Sucesso"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Erro"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Erro"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+        </div>
+    }
+
+    @* ── Corpo principal ──────────────────────────────────────── *@
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+
+    @* ── Footer ───────────────────────────────────────────────── *@
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-links">
+                &copy; 2026 — <strong>Liga dos Pets</strong>
+                <span class="mx-2 opacity-50">|</span>
+                <a asp-area="" asp-controller="Home" asp-action="About">Sobre</a>
+                <span class="mx-2 opacity-50">|</span>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidade</a>
+            </div>
+            <small>Desenvolvido com ❤️ para os animais</small>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+    <script src="~/js/chat-widget.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
